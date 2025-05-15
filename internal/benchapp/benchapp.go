@@ -1,8 +1,8 @@
 package benchapp
 
 import (
+	"bytes"
 	"encoding/csv"
-	"io"
 )
 
 type Game struct {
@@ -19,12 +19,14 @@ type Game struct {
 	Notes    string
 }
 
-// WriteCSV writes a slice of Game to the given writer as CSV, including the header row.
-func WriteCSV(w io.Writer, games []Game) error {
-	writer := csv.NewWriter(w)
+// WriteCSV accepts a slice of Game structs and returns the data as a csv []byte
+func WriteCSV(games []Game) ([]byte, error) {
+	var out []byte
+	buffer := bytes.NewBuffer(out)
+	writer := csv.NewWriter(buffer)
 	header := []string{"Type", "Game Type", "Title (Optional)", "Away", "Home", "Date", "Time", "Duration", "Location (Optional)", "Address (Optional)", "Notes (Optional)"}
 	if err := writer.Write(header); err != nil {
-		return err
+		return out, err
 	}
 	for _, g := range games {
 		row := []string{
@@ -41,9 +43,12 @@ func WriteCSV(w io.Writer, games []Game) error {
 			g.Notes,
 		}
 		if err := writer.Write(row); err != nil {
-			return err
+			return out, err
 		}
 	}
 	writer.Flush()
-	return writer.Error()
+	if err := writer.Error(); err != nil {
+		return out, err
+	}
+	return buffer.Bytes(), nil
 }

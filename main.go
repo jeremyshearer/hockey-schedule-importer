@@ -34,19 +34,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Use output path as provided, relative to current working directory
-	outFile, err := os.Create(*outputPath)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error creating output: %v\n", err)
-		os.Exit(1)
-	}
-	defer outFile.Close()
-
-	err = benchapp.WriteCSV(outFile, outputGames)
+	csvBytes, err := benchapp.WriteCSV(outputGames)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error writing output CSV: %v\n", err)
 		os.Exit(1)
 	}
 
+	err = os.WriteFile(*outputPath, csvBytes, 0644)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error creating output: %v\n", err)
+		os.Exit(1)
+	}
 	fmt.Println("Conversion complete. Output written to", *outputPath)
 }
