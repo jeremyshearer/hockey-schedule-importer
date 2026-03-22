@@ -1,6 +1,6 @@
 BIN = hockey-schedule-importer
 
-.PHONY: build test clean run
+.PHONY: build test clean run serve
 
 build:
 	go build -o $(BIN) .
@@ -12,4 +12,7 @@ clean:
 	rm -f $(BIN)
 
 run: build
-	./$(BIN)
+	./$(BIN) convert
+
+serve: build
+	./$(BIN) httpd
