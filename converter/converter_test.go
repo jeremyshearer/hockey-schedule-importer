@@ -1,4 +1,4 @@
-package main
+package converter
 
 import (
 	"bytes"
@@ -13,7 +13,7 @@ func TestParseInput(t *testing.T) {
 "2025-03-23T19:20:00.000Z","Mid Ice Crisis","Mid Ice Crisis","L 6 - 1","HatTrick Swayzes","HatTrick Swayzes","North"
 "2025-04-13T19:00:00.000Z","HatTrick Swayzes","HatTrick Swayzes","W 3 - 2","Puck Me","Puck Me","South"
 `
-	games, err := parseInput(strings.NewReader(input), io.Discard)
+	games, err := ParseInput(strings.NewReader(input), io.Discard)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -38,7 +38,7 @@ func TestParseInputSkipsShortRows(t *testing.T) {
 "2025-04-13T19:00:00.000Z","HatTrick Swayzes","","","Puck Me","Puck Me","South"
 `
 	var warn bytes.Buffer
-	games, err := parseInput(strings.NewReader(input), &warn)
+	games, err := ParseInput(strings.NewReader(input), &warn)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -55,7 +55,7 @@ func TestParseInputSkipsBadDates(t *testing.T) {
 "not-a-date","Team A","","","Team B","Team B","North"
 `
 	var warn bytes.Buffer
-	games, err := parseInput(strings.NewReader(input), &warn)
+	games, err := ParseInput(strings.NewReader(input), &warn)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -68,13 +68,13 @@ func TestParseInputSkipsBadDates(t *testing.T) {
 }
 
 func TestMarshalCSV(t *testing.T) {
-	games := []inputGame{{
+	games := []Game{{
 		Date:     time.Date(2025, 3, 23, 19, 20, 0, 0, time.UTC),
 		Visitor:  "Team A",
 		Home:     "Team B",
 		Location: "North",
 	}}
-	data, err := marshalCSV(games)
+	data, err := MarshalCSV(games)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -92,11 +92,11 @@ func TestRoundTrip(t *testing.T) {
 "2025-03-23T19:20:00.000Z","Mid Ice Crisis","Mid Ice Crisis","L 6 - 1","HatTrick Swayzes","HatTrick Swayzes","North"
 "2025-04-13T19:00:00.000Z","HatTrick Swayzes","HatTrick Swayzes","W 3 - 2","Puck Me","Puck Me","South"
 `
-	games, err := parseInput(strings.NewReader(input), io.Discard)
+	games, err := ParseInput(strings.NewReader(input), io.Discard)
 	if err != nil {
 		t.Fatal(err)
 	}
-	data, err := marshalCSV(games)
+	data, err := MarshalCSV(games)
 	if err != nil {
 		t.Fatal(err)
 	}
