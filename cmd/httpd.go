@@ -77,6 +77,8 @@ func handleConvert(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	r.Body = http.MaxBytesReader(w, r.Body, 1<<20) // 1MB
+
 	var csvBytes []byte
 	var err error
 
